@@ -104,7 +104,7 @@ decltype(auto) myWidget2 = cw;          //decltype类型推导
 template<typename Container, typename Index>
 decltype(auto) authAndAccess(Container& c, Index i);
 ````
-容器通过传引用的方式传递非常量左值引用（lvalue-reference-to-non-**const**），因为返回一个引用允许用户可以修改容器。但是这意味着在不能给这个函数传递右值容器，右值不能被绑定到左值引用上（除非这个左值引用是一个const（lvalue-references-to-**const**），但是这里明显不是）。
+容器通过传引用的方式传递非常量左值引用（lvalue-reference-to-**non-const**），因为返回一个引用允许用户可以修改容器。但是这意味着在不能给这个函数传递右值容器，右值不能被绑定到左值引用上（除非这个左值引用是一个const（lvalue-references-to-**const**），但是这里明显不是）。
 
 公认的向`authAndAccess`传递一个右值是一个[edge case](https://en.wikipedia.org/wiki/Edge_case)（译注：在极限操作情况下会发生的事情，类似于会发生但是概率较小的事情）。一个右值容器，是一个临时对象，通常会在`authAndAccess`调用结束被销毁，这意味着`authAndAccess`返回的引用将会成为一个悬置的（dangle）引用。但是使用向`authAndAccess`传递一个临时变量也并不是没有意义，有时候用户可能只是想简单的获得临时容器中的一个元素的拷贝，比如这样：
 ````cpp
@@ -152,7 +152,7 @@ authAndAccess(Container&& c, Index i)
 ````cpp
 int x = 0;
 ````
-中，`x`是一个变量的名字，所以`decltype(x)`是`int`。但是如果用一个小括号包覆这个名字，比如这样`(x)` ，就会产生一个比名字更复杂的表达式。对于名字来说，`x`是一个左值，C++11定义了表达式`(x)`也是一个左值。因此`decltype((x))`是`int&`。用小括号覆盖一个名字可以改变`decltype`对于名字产生的结果。
+中，`x`是一个变量名，所以`decltype(x)`是`int`。但是如果用一个小括号包覆这个变量名，比如这样`(x)` ，就会产生一个比变量名更复杂的表达式。对于变量名来说，`x`是一个左值，C++11定义了表达式`(x)`也是一个左值。因此`decltype((x))`是`int&`。用小括号覆盖一个变量名可以改变`decltype`对变量产生的结果。
 
 在C++11中这稍微有点奇怪，但是由于C++14允许了`decltype(auto)`的使用，这意味着你在函数返回语句中细微的改变就可以影响类型的推导：
 ````cpp
@@ -173,7 +173,7 @@ decltype(auto) f2()
 
 当使用`decltype(auto)`的时候一定要加倍的小心，在表达式中看起来无足轻重的细节将会影响到`decltype(auto)`的推导结果。为了确认类型推导是否产出了你想要的结果，请参见[Item4](https://github.com/kelthuzadx/EffectiveModernCppChinese/blob/master/1.DeducingTypes/item4.md)描述的那些技术。
 
-同时你也不应该忽略`decltype`这块大蛋糕。没错，`decltype`（单独使用或者与`auto`一起用）可能会偶尔产生一些令人惊讶的结果，但那毕竟是少数情况。通常，`decltype`都会产生你想要的结果，尤其是当你对一个名字使用`decltype`时，因为在这种情况下，`decltype`只是做一件本分之事：它产出名字的声明类型。
+同时你也不应该忽略`decltype`这块大蛋糕。没错，`decltype`（单独使用或者与`auto`一起用）可能会偶尔产生一些令人惊讶的结果，但那毕竟是少数情况。通常，`decltype`都会产生你想要的结果，尤其是当你对一个变量名使用`decltype`时，因为在这种情况下，`decltype`只是做一件本分之事：它返回变量的声明类型。
 
 **请记住：**
 
